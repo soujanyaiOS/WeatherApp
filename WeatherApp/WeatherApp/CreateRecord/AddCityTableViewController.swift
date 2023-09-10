@@ -7,8 +7,6 @@
 
 import UIKit
 
-
-
 class AddCityTableViewController: UITableViewController {
     private let viewModel = AddCityViewModel()
     private var weatherData: WeatherResponseDataModel?
@@ -40,12 +38,12 @@ class AddCityTableViewController: UITableViewController {
     
     // Implement UITableViewDataSource methods to display the weather data
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.cityList.count
+        return viewModel.cityListData.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
-        cell.textLabel?.text = viewModel.cityList[indexPath.row].name
+        cell.textLabel?.text = viewModel.cityListData[indexPath.row].name
         return cell
     }
 }
