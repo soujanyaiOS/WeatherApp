@@ -12,9 +12,4 @@ import CoreData
 @objc(WeatherEntryEntity)
 public class WeatherEntryEntity: NSManagedObject {
 
-    
-       // Add this method to your NSManagedObject subclass
-       class func transformerName() -> String {
-           return NSValueTransformerName.secureUnarchiveFromDataTransformerName.rawValue
-       }
 }

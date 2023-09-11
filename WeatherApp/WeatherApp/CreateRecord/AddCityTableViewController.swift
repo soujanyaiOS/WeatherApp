@@ -7,6 +7,7 @@
 
 import UIKit
 
+
 class AddCityTableViewController: UITableViewController {
     private let viewModel = AddCityViewModel()
     private var weatherData: WeatherResponseDataModel?
@@ -19,7 +20,7 @@ class AddCityTableViewController: UITableViewController {
     private func InitalSetup() {
         self.title = "Cities"
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
-        // Call fetchWeatherData with the desired city name
+        // Call getcities fron Coredata saved list if any
         viewModel.getCityList()
         bindObjects()
         
@@ -27,6 +28,7 @@ class AddCityTableViewController: UITableViewController {
         navigationItem.rightBarButtonItem = backButton
     }
     
+    ///Show alert on add click
     @objc func showAddCityAlert() {
         let alertController = UIAlertController(title: "Add City", message: "Enter a city name", preferredStyle: .alert)
         alertController.addTextField { textField in
@@ -56,19 +58,20 @@ class AddCityTableViewController: UITableViewController {
         }
     }
     
-    
+    /// Fetch weather data for entered city
     func fetchWeatherData(for city: String) {
         viewModel.fetchWeatherData(city: city)
     }
     
+    //MARK: - UITableview Data Source delegates
     // Implement UITableViewDataSource methods to display the weather data
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.cityListData.count
+        return viewModel.uniqueCityListData.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
-        cell.textLabel?.text = viewModel.cityListData[indexPath.row].name
+        cell.textLabel?.text = viewModel.uniqueCityListData[indexPath.row].name
         // Add the detail disclosure button
         cell.accessoryView?.isUserInteractionEnabled = true
         let infoIcon = UIImage(systemName: "info.circle")
@@ -82,18 +85,20 @@ class AddCityTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        navigateToWheatherDetailsScreen(data: viewModel.cityListData[indexPath.row])
+        navigateToWheatherDetailsScreen(data: viewModel.uniqueCityListData[indexPath.row])
     }
     
+    ///Navigation to weather details screen
     private func navigateToWheatherDetailsScreen (data: WeatherEntryEntity) {
         let detailsController = WeatherDetailsViewController()
         detailsController.data = data
         navigationController?.pushViewController(detailsController, animated: true)
     }
     
-    override func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {        
+    override func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
+        ///Navigation to weather info screen
         let detailsController = WeatherInfoViewController()
-         detailsController.data = viewModel.cityListData[indexPath.row]
+        detailsController.city = viewModel.uniqueCityListData[indexPath.row].name ?? ""
         self.present(detailsController, animated: true, completion: nil)
     }
 }

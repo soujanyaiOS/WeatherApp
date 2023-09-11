@@ -9,13 +9,32 @@ import UIKit
 
 class WeatherInfoViewController: UIViewController,UITableViewDelegate,UITableViewDataSource {
     
-    var data : WeatherEntryEntity?
+    private let viewModel = AddCityViewModel()
+    var data : [WeatherEntryEntity]?
     var tableArray = [Weather]()
     let tableView = UITableView()
+    var city = "" {
+        didSet {
+            viewModel.getWeatherDataforCity(city: city)
+            data = viewModel.CityWeatherInfor
+            bindObjects()
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
         setupUI()
+        
+    }
+    
+    /// Method to set all binding object functionality
+    private func bindObjects() {
+        viewModel.reloadTable.bind { [weak self] shouldReload in
+            if shouldReload {
+                self?.tableView.reloadData()
+            }
+        }
     }
     
     func createTableView() {
@@ -55,7 +74,7 @@ class WeatherInfoViewController: UIViewController,UITableViewDelegate,UITableVie
         let titleLabel = UILabel()
         
         // Set the text for the title label
-        titleLabel.text = "London Historical"
+        titleLabel.text = "\(city) Historical"
         titleLabel.font = UIFont.boldSystemFont(ofSize: 18)
         titleLabel.textColor = UIColor.black
         view.addSubview(titleLabel)
@@ -67,20 +86,24 @@ class WeatherInfoViewController: UIViewController,UITableViewDelegate,UITableVie
         
         createTableView()
         
-        do {
-            if let data = data?.weatherArray {
-                let decodedData: [Weather] = try JSONDecoder().decode([Weather].self, from: data as! Data)
-                // Handle `decodedData` here
-                tableArray.insert(contentsOf: decodedData, at: 0)
-                tableView.reloadData()
-            } else {
-                // Handle the case where `data?.weatherArray` is nil
-                print("Error: Data is nil")
+        for i in 0 ..< (data?.count ?? 0) {
+            
+            do {
+                if let data = data?[i].weatherArray {
+                    let decodedData: [Weather] = try JSONDecoder().decode([Weather].self, from: data as! Data)
+                    // Handle `decodedData` here
+                    tableArray.insert(contentsOf: decodedData, at: 0)
+                    
+                } else {
+                    // Handle the case where `data?.weatherArray` is nil
+                    print("Error: Data is nil")
+                }
+            } catch {
+                // Handle the decoding error here
+                print("Error decoding data: \(error)")
             }
-        } catch {
-            // Handle the decoding error here
-            print("Error decoding data: \(error)")
         }
+        tableView.reloadData()
         
     }
     
@@ -91,18 +114,44 @@ class WeatherInfoViewController: UIViewController,UITableViewDelegate,UITableVie
     
     // Implement UITableViewDataSource methods to display the weather data
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return tableArray.count
+        return data?.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
-        let temperatureInKelvin: Double = data?.temperature ?? 0.0
-        let temperatureInCelsius = DateConverter().kelvinToCelsius(temperatureInKelvin)
-        
-        let temperatureString = String(format: "Temperature : %.2f C",temperatureInCelsius  )
-        cell.textLabel?.text = (tableArray[indexPath.row].description ?? "") + " " +  temperatureString
+        let cellData =  configureCellData(row: indexPath.row)
+        var contentConfig = UIListContentConfiguration.subtitleCell()
+        contentConfig.text = cellData.0
+        contentConfig.secondaryText = cellData.1
+        cell.contentConfiguration = contentConfig
         
         return cell
+    }
+    
+    func configureCellData(row: Int ) -> (String, String){
+        
+        ///Get Temp in degrees
+        let temperatureInKelvin: Double = data?[row].temperature ?? 0.0
+        let temperatureInCelsius = DateConverter().kelvinToCelsius(temperatureInKelvin)
+        let temperatureString = String(format: "Temperature : %.2f C",temperatureInCelsius  )
+       
+        ///Get formatted Date
+        let dateString = DateConverter().convertDateFormat(timeInterval: Double(data?[row].dt ?? 0 ) )
+        var weatherDescription = ""        
+        do {
+            if let data = data?[row].weatherArray {
+                let decodedData: [Weather] = try JSONDecoder().decode([Weather].self, from: data as! Data)
+                if decodedData.count  > 0 {
+                    weatherDescription = decodedData[0].description ?? ""
+                }
+            }
+        } catch {
+            print("Error decoding data: \(error)")
+        }
+        
+        let primaryText =  dateString
+        let secondaryText = weatherDescription + temperatureString
+        return (primaryText,secondaryText)
     }
     
     

@@ -11,7 +11,7 @@ import CoreData
 class WeatherDataManager {
     static let shared = WeatherDataManager()
     
-    private lazy var persistentContainer: NSPersistentContainer = {
+     lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "WeatherApp") // Replace with your data model name
         container.loadPersistentStores { _, error in
             if let error = error {
@@ -40,14 +40,14 @@ class WeatherDataManager {
         if !weatherRecordExists(forId: weatherData.id ?? 0) {
             let context = persistentContainer.viewContext
             let weatherDataEntity = WeatherEntryEntity(context: context)
+            
             weatherDataEntity.setValue(weatherData.name, forKey: "name")
             weatherDataEntity.setValue(weatherData.name, forKey: "cityName")
             weatherDataEntity.setValue(weatherData.main?.temp, forKey: "temperature")            
             weatherDataEntity.setValue(weatherData.weather?.description, forKey: "weatherDescription")
-            weatherDataEntity.setValue(weatherData.id, forKey: "id")
+            weatherDataEntity.setValue(weatherData.sys?.id, forKey: "id")
             weatherDataEntity.setValue(weatherData.main?.humidity, forKey: "humidity")
             weatherDataEntity.setValue(weatherData.dt, forKey: "dt")
-            
             
             var weatherArray = [Weather]()
            
@@ -59,18 +59,12 @@ class WeatherDataManager {
                     ]
                     
                     weatherArray.insert(contentsOf: weatherentityObj, at: i)
-                   // weatherArray.append(weatherentityObj)
-                   // weatherArray.append(weatherentityObj)
                 }
             }
             
             if let encodedData = try? JSONEncoder().encode(weatherArray) {
                 weatherDataEntity.setValue(encodedData, forKey: "weatherArray")
             }
-            
-          
-            
-            //weatherDataEntity.humidity = NSNumber(value: humidityValue)
             weatherDataEntity.setValue(weatherData.wind?.speed, forKey: "windSpeed")
             do {
                 try context.save()
@@ -97,5 +91,54 @@ class WeatherDataManager {
             return []
         }
     }
+    
+    // Remove duplicate city data using reduce
+      func removeDuplicates(from cityData: [WeatherEntryEntity]) -> [WeatherEntryEntity] {
+          let uniqueCities = cityData.reduce(into: [WeatherEntryEntity]()) { (result, city) in
+              if !result.contains(where: { $0.name == city.name }) {
+                  result.append(city)
+              }
+          }
+          return uniqueCities
+      }
+    
+    // Fetch city data from Core Data based on city name
+        func fetchWeatherData(forCityName cityName: String) -> [WeatherEntryEntity] {
+            let context = persistentContainer.viewContext
+            let fetchRequest: NSFetchRequest<WeatherEntryEntity> = WeatherEntryEntity.fetchRequest()
+            
+            // Create a predicate to filter by city name
+            let predicate = NSPredicate(format: "name == %@", cityName)
+            fetchRequest.predicate = predicate
+            
+            do {
+                let weatherData = try context.fetch(fetchRequest)
+                return weatherData
+            } catch {
+                print("Error fetching city data: \(error)")
+                return []
+            }
+        }
+    
+    
+  
 }
+
+class CoreDataTestStack {
+    static let shared = CoreDataTestStack()
+
+    lazy var persistentContainer: NSPersistentContainer = {
+        let container = NSPersistentContainer(name: "WeatherApp")
+        let description = NSPersistentStoreDescription()
+        description.type = NSInMemoryStoreType
+        container.persistentStoreDescriptions = [description]
+        container.loadPersistentStores(completionHandler: { (_, error) in
+            if let error = error {
+                fatalError("Failed to load Core Data stack: \(error)")
+            }
+        })
+        return container
+    }()
+}
+
 

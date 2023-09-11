@@ -18,7 +18,7 @@ class DateConverter {
         let dateFormatter = DateFormatter()
 
         // Set the desired date format
-        dateFormatter.dateFormat = "MM-dd-yyyy"
+        dateFormatter.dateFormat = "MM-dd-yyyy HH:mm:ss"
 
         // Convert the Unix timestamp to a Date object
         let date = Date(timeIntervalSince1970: TimeInterval(unixTimestamp))
