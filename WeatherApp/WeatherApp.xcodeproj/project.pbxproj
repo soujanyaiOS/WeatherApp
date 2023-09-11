@@ -143,9 +143,6 @@
 		353EF2F72AACF31C0023EED0 = {
 			isa = PBXGroup;
 			children = (
-				353EF37B2AAE61EC0023EED0 /* DateConverter.swift */,
-				353EF36E2AADDCBC0023EED0 /* WeatherApp.xcdatamodeld */,
-				353EF35E2AADD5290023EED0 /* Coredata classes */,
 				353EF3022AACF31C0023EED0 /* WeatherApp */,
 				353EF31C2AACF31E0023EED0 /* WeatherAppTests */,
 				353EF3262AACF31E0023EED0 /* WeatherAppUITests */,
@@ -168,9 +165,7 @@
 		353EF3022AACF31C0023EED0 /* WeatherApp */ = {
 			isa = PBXGroup;
 			children = (
-				353EF3592AAD095A0023EED0 /* DynamicObserver.swift */,
-				353EF3032AACF31C0023EED0 /* AppDelegate.swift */,
-				353EF3052AACF31C0023EED0 /* SceneDelegate.swift */,
+				353EF37D2AAECE390023EED0 /* Common */,
 				353EF3382AACF4180023EED0 /* CreateRecord */,
 				353EF3362AACF4170023EED0 /* Extensions */,
 				353EF33F2AACF4180023EED0 /* NetworkLayer */,
@@ -247,11 +242,16 @@
 			path = WeatherDetails;
 			sourceTree = "<group>";
 		};
-		353EF35E2AADD5290023EED0 /* Coredata classes */ = {
+		353EF37D2AAECE390023EED0 /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				353EF36E2AADDCBC0023EED0 /* WeatherApp.xcdatamodeld */,
+				353EF37B2AAE61EC0023EED0 /* DateConverter.swift */,
+				353EF3592AAD095A0023EED0 /* DynamicObserver.swift */,
+				353EF3032AACF31C0023EED0 /* AppDelegate.swift */,
+				353EF3052AACF31C0023EED0 /* SceneDelegate.swift */,
 			);
-			path = "Coredata classes";
+			path = Common;
 			sourceTree = "<group>";
 		};
 		428E8817C0C5FF3620FC0055 /* Pods */ = {
@@ -880,8 +880,7 @@
 				353EF36F2AADDCBC0023EED0 /* WeatherApp.xcdatamodel */,
 			);
 			currentVersion = 353EF36F2AADDCBC0023EED0 /* WeatherApp.xcdatamodel */;
-			name = WeatherApp.xcdatamodeld;
-			path = WeatherApp/WeatherApp.xcdatamodeld;
+			path = WeatherApp.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};

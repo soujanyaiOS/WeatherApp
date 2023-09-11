@@ -12,8 +12,7 @@ import SVProgressHUD
 
 struct ApiServices {
     
-    static let shared = ApiServices()
-    
+    static let shared = ApiServices()    
     private init() {}
     
     
