@@ -23,23 +23,7 @@ struct ApiServices {
     
     private func loadResources<T: Decodable>(from path: String,
                                              completion: @escaping(Result<T,Error>) -> Void) {
-      /*  if let url = path.asURL {
-            let urlSession = URLSession(configuration: .default).dataTask(with: url) { (data, _, error) in
-                if let error = error {
-                    completion(.failure(error))
-                }
-                if let data = data {
-                    do {
-                        let decoder = JSONDecoder()
-                        let response = try decoder.decode(T.self, from: data)
-                        completion(.success(response))
-                    }  catch {
-                        debugPrint("error: ", error)
-                    }
-                }
-            }
-            urlSession.resume()
-        }*/
+
         
         SVProgressHUD.show()
         if let url = path.asURL {
