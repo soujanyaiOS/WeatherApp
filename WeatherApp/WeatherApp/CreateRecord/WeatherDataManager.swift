@@ -24,7 +24,7 @@ class WeatherDataManager {
     
     func weatherRecordExists(forId id: Int) -> Bool {
         let context = persistentContainer.viewContext
-        let fetchRequest: NSFetchRequest<WeatherEntity> = WeatherEntity.fetchRequest()
+        let fetchRequest: NSFetchRequest<WeatherEntryEntity> = WeatherEntryEntity.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "id == %i", id)
         
         do {
@@ -39,12 +39,39 @@ class WeatherDataManager {
     func saveWeatherResponse(weatherData : WeatherResponseDataModel) {
         if !weatherRecordExists(forId: weatherData.id ?? 0) {
             let context = persistentContainer.viewContext
-            let weatherDataEntity = WeatherEntity(context: context)
+            let weatherDataEntity = WeatherEntryEntity(context: context)
             weatherDataEntity.setValue(weatherData.name, forKey: "name")
             weatherDataEntity.setValue(weatherData.name, forKey: "cityName")
-            weatherDataEntity.setValue(weatherData.main?.temp, forKey: "temperature")
+            weatherDataEntity.setValue(weatherData.main?.temp, forKey: "temperature")            
             weatherDataEntity.setValue(weatherData.weather?.description, forKey: "weatherDescription")
             weatherDataEntity.setValue(weatherData.id, forKey: "id")
+            weatherDataEntity.setValue(weatherData.main?.humidity, forKey: "humidity")
+            weatherDataEntity.setValue(weatherData.dt, forKey: "dt")
+            
+            
+            var weatherArray = [Weather]()
+           
+            for i in 0 ..< (weatherData.weather?.count ?? 0) {
+                if let obj =  weatherData.weather {
+                    let weatherObj: Weather = obj[i]
+                    var weatherentityObj: [Weather] = [
+                        Weather(id: weatherObj.id, icon: weatherObj.icon, main: weatherObj.main, description: weatherObj.description)
+                    ]
+                    
+                    weatherArray.insert(contentsOf: weatherentityObj, at: i)
+                   // weatherArray.append(weatherentityObj)
+                   // weatherArray.append(weatherentityObj)
+                }
+            }
+            
+            if let encodedData = try? JSONEncoder().encode(weatherArray) {
+                weatherDataEntity.setValue(encodedData, forKey: "weatherArray")
+            }
+            
+          
+            
+            //weatherDataEntity.humidity = NSNumber(value: humidityValue)
+            weatherDataEntity.setValue(weatherData.wind?.speed, forKey: "windSpeed")
             do {
                 try context.save()
             } catch {
@@ -52,22 +79,21 @@ class WeatherDataManager {
             }
         }
         else {
-            print("Weather record already exists for id: \(String(describing: weatherData.id))")
+             print("Weather record already exists for id: \(String(describing: weatherData.id))")
         }
         
         
     }
     
-    func fetchWeatherData() -> [WeatherEntity] {
+    func fetchWeatherData() -> [WeatherEntryEntity] {
         let context = persistentContainer.viewContext
-        let fetchRequest: NSFetchRequest<WeatherEntity> = WeatherEntity.fetchRequest()
+        let fetchRequest: NSFetchRequest<WeatherEntryEntity> = WeatherEntryEntity.fetchRequest()
         
         do {
             let weatherData = try context.fetch(fetchRequest)
-            print(weatherData.count)
             return weatherData
         } catch {
-            print("Error fetching weather data: \(error)")
+              print("Error fetching weather data: \(error)")
             return []
         }
     }

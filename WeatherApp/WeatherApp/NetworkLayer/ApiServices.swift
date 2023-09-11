@@ -6,6 +6,9 @@
 //
 
 import Foundation
+import Alamofire
+import SVProgressHUD
+
 
 struct ApiServices {
     
@@ -20,7 +23,7 @@ struct ApiServices {
     
     private func loadResources<T: Decodable>(from path: String,
                                              completion: @escaping(Result<T,Error>) -> Void) {
-        if let url = path.asURL {
+      /*  if let url = path.asURL {
             let urlSession = URLSession(configuration: .default).dataTask(with: url) { (data, _, error) in
                 if let error = error {
                     completion(.failure(error))
@@ -36,6 +39,31 @@ struct ApiServices {
                 }
             }
             urlSession.resume()
+        }*/
+        
+        SVProgressHUD.show()
+        if let url = path.asURL {
+        AF.request(url, method: .get)
+            .validate()
+            .responseDecodable(of: T.self) { response in
+                SVProgressHUD.dismiss()
+                switch response.result {
+                case .success(let value):
+                    // Handle successful response here
+                    print("Response: \(value)")
+                   
+                    completion(.success(value))
+
+                    // You can parse and process the response data here
+
+                case .failure(let error):
+                    // Handle request failure here
+                    print("Error: \(error)")
+                    SVProgressHUD.showError(withStatus: "Error: \(error)")
+
+                    // You can handle errors and provide appropriate feedback to the user
+                }
+            }
         }
     }
 }
