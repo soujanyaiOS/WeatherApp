@@ -54,7 +54,7 @@ class WeatherDataManager {
             for i in 0 ..< (weatherData.weather?.count ?? 0) {
                 if let obj =  weatherData.weather {
                     let weatherObj: Weather = obj[i]
-                    var weatherentityObj: [Weather] = [
+                    let weatherentityObj: [Weather] = [
                         Weather(id: weatherObj.id, icon: weatherObj.icon, main: weatherObj.main, description: weatherObj.description)
                     ]
                     

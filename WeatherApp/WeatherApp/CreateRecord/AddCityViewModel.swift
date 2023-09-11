@@ -23,7 +23,6 @@ class AddCityViewModel {
             switch response {
                 
             case .success(let list):
-                print(list.name)
                 WeatherDataManager.shared.saveWeatherResponse(weatherData: list)
                 self?.getCityList()
               
